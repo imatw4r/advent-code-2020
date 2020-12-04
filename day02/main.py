@@ -1,42 +1,37 @@
 import os
-from collections import namedtuple, Counter
-
+from collections import namedtuple
+import re
+from functools import partial
 
 BASE_DIR = os.path.dirname(__file__)
 
-PasswordPolicy = namedtuple("PasswordPolicy", "min, max, letter")
+PasswordPolicy = namedtuple("PasswordPolicy", "left_value, right_value, char")
 Password = namedtuple("Password", "value, policy")
 
-
-def to_password(line):
-    range_, letter, password = line.split(" ")
-    min_, max_ = range_.split("-")
-    policy = PasswordPolicy(int(min_), int(max_), letter.strip(":"))
-    password = Password(password.rstrip(), policy)
-    return password
+RE_POLICY_PATTERN = r"([0-9]+)-([0-9]+) ([a-z]{1})"
 
 
-def is_valid(password: Password):
-    """
-    Validate policy according to 1st task
-    """
+def is_valid_by_default_policy(password: Password) -> bool:
     policy = password.policy
-    count = Counter(password.value)
-
-    return policy.min <= count.get(policy.letter, -1) <= policy.max
+    return policy.left_value <= password.value.count(policy.char) <= policy.right_value
 
 
-def is_valid2(password: Password):
-    """
-    Validate policy according to 2nd task
-    """
+def is_valid_by_enhanced_policy(password: Password) -> bool:
     policy = password.policy
+    pos_1 = slice(policy.left_value - 1, policy.left_value)
+    pos_2 = slice(policy.right_value - 1, policy.right_value)
     value = password.value
-    password_letters = [value[policy.min - 1], value[policy.max - 1]]
-    return policy.letter in password_letters and len(set(password_letters)) == 2
+    hits = sum((value[pos_1] == policy.char, value[pos_2] == policy.char))
+    return hits == 1
+
+
+def to_password(line: str) -> Password:
+    policy, password = line.split(": ")
+    min_, max_, char = re.match(RE_POLICY_PATTERN, policy).groups()
+    return Password(password.strip(), PasswordPolicy(int(min_), int(max_), char))
 
 
 with open(os.path.join(BASE_DIR, "data.in"), "r") as fp:
     data = list(map(to_password, fp.readlines()))
-    print("Part 1 count:", sum(map(is_valid, data)))
-    print("Part 2 count:", sum(map(is_valid2, data)))
+    print("Part 1 count:", sum(map(is_valid_by_default_policy, data)))
+    print("Part 2 count:", sum(map(is_valid_by_enhanced_policy, data)))
