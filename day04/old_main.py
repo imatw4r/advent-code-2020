@@ -4,6 +4,7 @@ import re
 
 
 def to_passport(data: str) -> dict:
+    data = map(str.strip, data)
     return dict((element.split(":") for element in (" ").join(data).split(" ")))
 
 
