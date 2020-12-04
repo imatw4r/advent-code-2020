@@ -42,33 +42,30 @@ def hgt_is_valid(value: str) -> bool:
     return ranges[unit](value)
 
 
-class DefaultPassportValidator(object):
-    def is_valid(self, passport) -> bool:
-        required_fields = {
-            "byr",
-            "iyr",
-            "eyr",
-            "hgt",
-            "hcl",
-            "ecl",
-            "pid",
-        }
-        return required_fields.issubset(set(passport.keys()))
+def is_valid_by_basic_rules(passport) -> bool:
+    required_fields = {
+        "byr",
+        "iyr",
+        "eyr",
+        "hgt",
+        "hcl",
+        "ecl",
+        "pid",
+    }
+    return required_fields.issubset(set(passport.keys()))
 
 
-class EnhancedPassportValidator(DefaultPassportValidator):
-    def is_valid(self, passport) -> bool:
-        return super().is_valid(passport) and self._is_valid(passport)
-
-    def _is_valid(self, passport) -> bool:
-        validators = {
-            "byr": byr_is_valid,
-            "iyr": iyr_is_valid,
-            "eyr": eyr_is_valid,
-            "hgt": hgt_is_valid,
-            "hcl": hcl_is_valid,
-            "ecl": ecl_is_valid,
-            "pid": pid_is_valid,
-            "cid": cid_is_valid,
-        }
-        return all((validators[key](value) for key, value in passport.items()))
+def is_valid_by_enhanced_rules(passport) -> bool:
+    validators = {
+        "byr": byr_is_valid,
+        "iyr": iyr_is_valid,
+        "eyr": eyr_is_valid,
+        "hgt": hgt_is_valid,
+        "hcl": hcl_is_valid,
+        "ecl": ecl_is_valid,
+        "pid": pid_is_valid,
+        "cid": cid_is_valid,
+    }
+    if not is_valid_by_basic_rules(passport):
+        return False
+    return all((validators[key](value) for key, value in passport.items()))
