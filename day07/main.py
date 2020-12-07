@@ -94,7 +94,8 @@ def count_bags_inside_bag(
 with open(os.path.join(BASE_DIR, "data.in"), "r") as fp:
     data = list(map(str.strip, fp))
     rules = build_bag_rules(data)
-    count_1 = count_bags_containing_bag(bag_name="shiny gold", rules=rules)
-    count_2 = count_bags_inside_bag(bag_name="shiny gold", rules=rules)
-    print("Part 1 answer:", count_1)
-    print("Part 2 answer:", count_2)
+    bag_name = "shiny gold"
+    count_1 = count_bags_containing_bag(bag_name=bag_name, rules=rules)
+    count_2 = count_bags_inside_bag(bag_name=bag_name, rules=rules)
+    print(f"Number of bags that can contain {bag_name!r} bag:", count_1)
+    print(f"Number of bags inside {bag_name!r} bag:", count_2)
