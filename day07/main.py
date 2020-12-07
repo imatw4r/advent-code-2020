@@ -1,6 +1,6 @@
 import os
 import re
-from functools import reduce, partial
+from functools import reduce
 from typing import Dict, List, Tuple
 
 
@@ -53,17 +53,13 @@ def build_bag_rules(data: List[str]) -> BagRules:
 
 
 def count_bags_containing_bag(bag_name: str, rules: BagRules) -> int:
-    def _get_bags(bag_name: str, available_bags: set):
-        bags = [bag for bag, content in rules.items() if bag_name in content]
-        if not bags:
-            return available_bags
+    def _get_bags(bag_name: str) -> List[str]:
+        matching_bags = [bag for bag, content in rules.items() if bag_name in content]
+        for bag in matching_bags:
+            yield from _get_bags(bag)
+        yield matching_bags
 
-        available_bags.update(bags)
-        for bag in bags:
-            available_bags.update(_get_bags(bag, available_bags))
-        return available_bags
-
-    return len(_get_bags(bag_name, set()))
+    return len(reduce(set.union, map(set, _get_bags(bag_name))))
 
 
 def count_bags_inside_bag(
@@ -77,6 +73,7 @@ def count_bags_inside_bag(
 
         return sum((amount * _count_bags(bag) for bag, amount in bag_content)) + 1
 
+    # We have to subtract one to not count the bag itself.
     return _count_bags(bag_name) - 1
 
 
