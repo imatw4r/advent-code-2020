@@ -4,10 +4,9 @@ from commands import (
     JMPCommand,
     NOPCommand,
     AddCommand,
-    NewGameCommand,
+    CreateNewGameCommand,
     GameCommandFactory,
 )
-
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -17,7 +16,7 @@ def create_game_console(data):
 
     def create_command(line):
         cmd, value = line.split(" ")
-        return GameCommandFactory(command_name=cmd)(receiver=console, int(value))
+        return GameCommandFactory(command_name=cmd)(receiver=console, value=int(value))
 
     commands = map(create_command, data)
     console.add_commands(commands)

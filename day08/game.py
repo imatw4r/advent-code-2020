@@ -33,7 +33,6 @@ class GameConsole(object):
             self.add_command(cmd)
 
     def run(self):
-        step = 0
         while self.current_process < len(self.processes):
             process = self.processes[self.current_process]
             if process.was_executed:

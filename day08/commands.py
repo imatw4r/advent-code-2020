@@ -38,6 +38,9 @@ class NOPCommand(GameCommand):
 
 
 class JMPCommand(GameCommand):
+    def __init__(self, receiver: GameConsole, value: int):
+        super().__init__(receiver, jump_by=value)
+
     def is_jmp(self):
         return True
 
@@ -52,9 +55,9 @@ class JMPCommand(GameCommand):
 
 
 class AddCommand(GameCommand):
-    def __init__(self, receiver: GameConsole, amount: int):
+    def __init__(self, receiver: GameConsole, value: int):
         super().__init__(receiver, jump_by=1)
-        self.amount = amount
+        self.amount = value
 
     def execute(self):
         super().execute()
@@ -87,7 +90,7 @@ class SwapProcessCommand(GameCommand):
             self.receiver.processes[self.process_nr] = self.old_process
 
 
-class NewGameCommand(GameCommand):
+class CreateNewGameCommand(GameCommand):
     def __init__(self, receiver):
         super().__init__(receiver)
         self.new_game = GameConsole()
