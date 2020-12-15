@@ -1,5 +1,6 @@
 import os
 from typing import List, Iterable, Tuple
+from itertools import chain
 import re
 
 BASE_DIR = os.path.dirname(__file__)
@@ -53,6 +54,10 @@ def groupby_mask(data: InputData) -> Iterable[Tuple[BitMask, MemoryAddress, Valu
 def generate_memory_addresses(
     memory_mask: MemoryMask, prefix: str = ""
 ) -> Iterable[MemoryAddress]:
+    if "X" not in chain(prefix, memory_mask):
+        yield int(prefix + memory_mask, 2)
+        return
+
     for idx, char in enumerate(memory_mask):
         if char == "X":
             yield from generate_memory_addresses(
@@ -61,8 +66,6 @@ def generate_memory_addresses(
             yield from generate_memory_addresses(
                 "1" + memory_mask[idx + 1 :], prefix + memory_mask[:idx]
             )
-        if "X" not in prefix + memory_mask:
-            yield int(prefix + memory_mask, 2)
 
 
 def use_decoder_v1(data: InputData) -> int:
@@ -85,6 +88,6 @@ def use_decoder_v2(data: InputData) -> int:
 with open(os.path.join(BASE_DIR, "data.in"), "r") as fp:
     data = list(map(str.strip, fp))
     v1_decoded_sum = use_decoder_v1(data)
-    v2_decoded_sum = use_decoder_v2(data)
     print("Task 1 answer:", v1_decoded_sum)
+    v2_decoded_sum = use_decoder_v2(data)
     print("Task 2 answer:", v2_decoded_sum)
